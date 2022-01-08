@@ -6,12 +6,14 @@
       <div>{{ user.username }}</div>
     </div>
     <div class="maction">
-      <span><el-link href="/#/blogs">主页</el-link></span>
+      <span><el-link href="/blogs">主页</el-link></span>
       <el-divider direction="vertical"></el-divider>
-      <span><el-link type="success" href="/#/blog/add">发表博客</el-link></span>
+      <span><el-link href="/Info" type="warning">个人信息</el-link></span>
+      <el-divider direction="vertical"></el-divider>
+      <span><el-link type="success" href="/blog/add">发表博客</el-link></span>
       <el-divider direction="vertical"></el-divider>
       <span v-show="!hasLogin"
-        ><el-link type="primary" href="/#/login">登录</el-link></span
+        ><el-link type="primary" href="/login">登录</el-link></span
       >
       <span v-show="hasLogin"
         ><el-link type="danger" @click="logout">退出</el-link></span

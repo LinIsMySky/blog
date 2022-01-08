@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 登录页面 -->
+    <!-- 注册页面 -->
     <el-container>
       <el-main>
         <el-form
@@ -10,20 +10,41 @@
           label-width="100px"
           class="demo-ruleForm"
         >
+          <el-form-item
+            prop="email"
+            label="邮箱"
+            :rules="[
+              { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+              {
+                type: 'email',
+                message: '请输入正确的邮箱地址',
+                trigger: ['blur', 'change'],
+              },
+            ]"
+          >
+            <el-input v-model="ruleForm.email"></el-input>
+          </el-form-item>
           <el-form-item label="用户名" prop="username">
             <el-input v-model="ruleForm.username"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
             <el-input type="password" v-model="ruleForm.password"></el-input>
           </el-form-item>
+          <el-form-item label="确认密码" prop="checkPass">
+            <el-input
+              type="password"
+              v-model="ruleForm.checkPass"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="submitForm('ruleForm')"
-              >立即登录</el-button
+              >立即注册</el-button
             >
             <el-button @click="resetForm('ruleForm')">重置</el-button>
-            <el-button type="primary">
-              <router-link to="/reg">注册</router-link>
-            </el-button>
+            <el-button>
+              <router-link to="/login">去登录</router-link></el-button
+            >
           </el-form-item>
         </el-form>
       </el-main>
@@ -33,14 +54,37 @@
 
 <script>
 export default {
-  name: "Login",
+  name: "Reg",
   data() {
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+        if (this.ruleForm.checkPass !== "") {
+          this.$refs.ruleForm.validateField("checkPass");
+        }
+        callback();
+      }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.ruleForm.password) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
     return {
       ruleForm: {
         username: "",
         password: "",
+        email: "",
       },
       rules: {
+        checkPass: [
+          { required: true, validator: validatePass2, trigger: "blur" },
+        ],
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
           {
@@ -51,7 +95,12 @@ export default {
           },
         ],
         password: [
-          { required: true, message: "请选择密码", trigger: "change" },
+          {
+            required: true,
+            message: "请输入密码",
+            validator: validatePass,
+            trigger: "blur",
+          },
         ],
       },
     };
@@ -61,14 +110,13 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          const _this = this;
-          this.$axios.post("/login", this.ruleForm).then((res) => {
-            const jwt = res.headers["authorization"];
-            const userInfo = res.data.data;
-            _this.$store.commit("SET_TOKEN", jwt);
-            _this.$store.commit("SET_USERINFO", userInfo);
-            _this.$router.push("/blogs");
-            // 通过vuex全局保存token数据和用户基本数据,router成功之后跳转博客主页面
+          // const _this = this;
+          this.$axios.post("/reg", this.ruleForm).then((res) => {
+            console.log(res);
+            this.$message({
+              message: "成功注册",
+              type: "success",
+            });
           });
         } else {
           console.log("error submit!!");
@@ -83,7 +131,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .el-header,
 .el-footer {
   background-color: #b3c0d1;
@@ -130,6 +178,5 @@ body > .el-container {
 
 a {
   text-decoration: none;
-  color: white;
 }
 </style>
